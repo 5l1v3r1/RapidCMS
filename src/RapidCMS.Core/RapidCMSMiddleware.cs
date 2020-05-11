@@ -53,8 +53,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton(rootConfig);
             services.AddSingleton<ICmsConfig>(rootConfig);
 
-            // var cmsSetup = new CmsSetup(rootConfig);
-
             services.AddSingleton<ICms, CmsSetup>();
             services.AddSingleton(x => (ILogin)x.GetService(typeof(ICms)));
 
@@ -67,7 +65,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ISetupResolver<ITypeRegistration, CustomTypeRegistrationConfig>, TypeRegistrationSetupResolver>();
             services.AddSingleton<ISetupResolver<IEntityVariantSetup, EntityVariantConfig>, EntityVariantSetupResolver>();
             services.AddSingleton<ISetupResolver<TreeViewSetup, TreeViewConfig>, TreeViewSetupResolver>();
-
             services.AddSingleton<ISetupResolver<PaneSetup, PaneConfig>, PaneSetupResolver>();
             services.AddSingleton<ISetupResolver<ListSetup, ListConfig>, ListSetupResolver>();
             services.AddSingleton<ISetupResolver<NodeSetup, NodeConfig>, NodeSetupResolver>();
@@ -104,7 +101,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IDragInteraction, DragInteraction>();
             services.AddTransient<IInteractionService, InteractionService>();
 
-            services.AddTransient<IAuthService, AuthService>();
+            // TODO: switch services.AddTransient<IAuthService, ServerSideAuthService>();
+            services.AddTransient<IAuthService, ClientSideAuthService>();
             services.AddTransient<IConcurrencyService, ConcurrencyService>();
             services.AddSingleton<IExceptionService, ExceptionService>();
             services.AddScoped<IMessageService, MessageService>();

@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using RapidCMS.Core.Abstractions.Config;
 using RapidCMS.Core.Enums;
+using RapidCMS.Core.Repositories;
 using RapidCMS.Example.Shared.Data;
-using RapidCMS.Repositories;
 
 namespace RapidCMS.Example.Shared.Collections
 {
@@ -11,7 +11,7 @@ namespace RapidCMS.Example.Shared.Collections
         // CRUD editor with support for one-to-many relation + validation
         public static void AddCountryCollection(this ICmsConfig config)
         {
-            config.AddCollection<Country, JsonRepository<Country>>("country", "Countries", collection =>
+            config.AddCollection<Country, BaseRepository<Country>>("country", "Countries", collection =>
             {
                 collection
                     // Set showEntities to true to have this collection to fold open on default

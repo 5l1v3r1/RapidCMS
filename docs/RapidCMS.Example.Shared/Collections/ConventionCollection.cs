@@ -1,7 +1,7 @@
 ﻿using RapidCMS.Core.Abstractions.Config;
 using RapidCMS.Core.Enums;
+using RapidCMS.Core.Repositories;
 using RapidCMS.Example.Shared.Data;
-using RapidCMS.Repositories;
 
 namespace RapidCMS.Example.Shared.Collections
 {
@@ -10,7 +10,7 @@ namespace RapidCMS.Example.Shared.Collections
         // CRUD editor for simple POCO based on conventions 
         public static void AddConventionCollection(this ICmsConfig config)
         {
-            config.AddCollection<ConventionalPerson, JsonRepository<ConventionalPerson>>("person-convention", "People (by convention)", collection =>
+            config.AddCollection<ConventionalPerson, BaseRepository<ConventionalPerson>>("person-convention", "People (by convention)", collection =>
             {
                 collection.SetTreeView(x => x.Name);
 

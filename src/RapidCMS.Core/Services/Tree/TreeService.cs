@@ -44,46 +44,54 @@ namespace RapidCMS.Core.Services.Tree
 
         public async Task<TreeCollectionUI?> GetCollectionAsync(string alias, ParentPath? parentPath)
         {
-            var collection = _collectionResolver.ResolveSetup(alias);
-            if (collection == null)
+            try
             {
-                throw new InvalidOperationException($"Failed to get collection for given alias ({alias}).");
-            }
-
-            var parent = await _parentService.GetParentAsync(parentPath);
-
-            var testEntity = await _repositoryResolver.GetRepository(collection).NewAsync(parent, collection.EntityVariant.Type);
-
-            var tree = new TreeCollectionUI(collection.Alias, collection.Name)
-            {
-                EntitiesVisible = collection.TreeView?.EntityVisibility == EntityVisibilty.Visible,
-                RootVisible = collection.TreeView?.RootVisibility == CollectionRootVisibility.Visible,
-                Icon = collection.Icon ?? "list",
-                DefaultOpenEntities = collection.TreeView?.DefaultOpenEntities ?? false
-            };
-
-            if (collection.ListEditor != null && await _authService.IsUserAuthorizedAsync(Operations.Update, testEntity))
-            {
-                tree.State = new PageStateModel
+                var collection = _collectionResolver.ResolveSetup(alias);
+                if (collection == null)
                 {
-                    CollectionAlias = collection.Alias,
-                    PageType = PageType.Collection,
-                    ParentPath = parentPath,
-                    UsageType = UsageType.Edit
-                };
-            }
-            else if (collection.ListView != null && await _authService.IsUserAuthorizedAsync(Operations.Read, testEntity))
-            {
-                tree.State = new PageStateModel
-                {
-                    CollectionAlias = collection.Alias,
-                    PageType = PageType.Collection,
-                    ParentPath = parentPath,
-                    UsageType = UsageType.View
-                };
-            }
+                    throw new InvalidOperationException($"Failed to get collection for given alias ({alias}).");
+                }
 
-            return tree;
+                var parent = await _parentService.GetParentAsync(parentPath);
+
+                var testEntity = await _repositoryResolver.GetRepository(collection).NewAsync(parent, collection.EntityVariant.Type);
+
+                var tree = new TreeCollectionUI(collection.Alias, collection.Name)
+                {
+                    EntitiesVisible = collection.TreeView?.EntityVisibility == EntityVisibilty.Visible,
+                    RootVisible = collection.TreeView?.RootVisibility == CollectionRootVisibility.Visible,
+                    Icon = collection.Icon ?? "list",
+                    DefaultOpenEntities = collection.TreeView?.DefaultOpenEntities ?? false
+                };
+
+                if (collection.ListEditor != null && await _authService.IsUserAuthorizedAsync(Operations.Update, testEntity))
+                {
+                    tree.State = new PageStateModel
+                    {
+                        CollectionAlias = collection.Alias,
+                        PageType = PageType.Collection,
+                        ParentPath = parentPath,
+                        UsageType = UsageType.Edit
+                    };
+                }
+                else if (collection.ListView != null && await _authService.IsUserAuthorizedAsync(Operations.Read, testEntity))
+                {
+                    tree.State = new PageStateModel
+                    {
+                        CollectionAlias = collection.Alias,
+                        PageType = PageType.Collection,
+                        ParentPath = parentPath,
+                        UsageType = UsageType.View
+                    };
+                }
+
+                return tree;
+            }
+            catch (Exception ex) 
+            {
+                Console.Write(ex);
+                return null;
+            }
         }
 
         public Task<TreePageUI?> GetPageAsync(string alias)

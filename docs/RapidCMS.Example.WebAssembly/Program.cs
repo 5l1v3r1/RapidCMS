@@ -11,6 +11,11 @@ using RapidCMS.Example.Shared.Components;
 using RapidCMS.Repositories;
 using RapidCMS.Example.Shared.Data;
 using RapidCMS.Example.Shared.Collections;
+using RapidCMS.Core.Repositories;
+using RapidCMS.Example.Shared.DataViews;
+using RapidCMS.Example.Shared.Handlers;
+using RapidCMS.Core.Abstractions.Setup;
+using Blazored.LocalStorage;
 
 namespace RapidCMS.Example.WebAssembly
 {
@@ -25,8 +30,22 @@ namespace RapidCMS.Example.WebAssembly
 
             builder.Services.AddAuthorizationCore();
 
-            builder.Services.AddSingleton<InMemoryRepository<Person>>();
-            builder.Services.AddSingleton<InMemoryRepository<User>>();
+            builder.Services.AddBlazoredLocalStorage();
+
+            builder.Services.AddScoped<BaseRepository<Person>, LocalStorageRepository<Person>>();
+            builder.Services.AddSingleton<BaseRepository<ConventionalPerson>, InMemoryRepository<ConventionalPerson>>();
+            builder.Services.AddSingleton<BaseRepository<Country>, InMemoryRepository<Country>>();
+            builder.Services.AddSingleton<BaseRepository<User>, InMemoryRepository<User>>();
+            builder.Services.AddSingleton<BaseRepository<TagGroup>, InMemoryRepository<TagGroup>>();
+            builder.Services.AddSingleton<BaseRepository<Tag>, InMemoryRepository<Tag>>();
+
+            builder.Services.AddSingleton<MappedBaseRepository<MappedEntity, DatabaseEntity>, MappedInMemoryRepository<MappedEntity, DatabaseEntity>>();
+            builder.Services.AddSingleton<IConverter<MappedEntity, DatabaseEntity>, Mapper>();
+            builder.Services.AddSingleton<DatabaseEntityDataViewBuilder>();
+
+            builder.Services.AddSingleton<RandomNameActionHandler>();
+            builder.Services.AddSingleton<Base64TextFileUploadHandler>();
+            builder.Services.AddSingleton<Base64ImageUploadHandler>();
 
             builder.Services.AddRapidCMS(config =>
             {
@@ -35,10 +54,34 @@ namespace RapidCMS.Example.WebAssembly
                 config.SetCustomLoginStatus(typeof(LoginStatus));
 
                 config.AddPersonCollection();
+
+                config.AddCountryCollection();
+
+                config.AddPage("beaker", "Some random page", config =>
+                {
+                    config.AddSection(typeof(CustomSection));
+                    config.AddSection("country", edit: false);
+                });
+
                 config.AddUserCollection();
+
+                config.AddTagCollection();
+
+                config.AddMappedCollection();
+
+                config.AddConventionCollection();
+
+                config.Dashboard.AddSection(typeof(DashboardSection));
+                config.Dashboard.AddSection("user", edit: true);
             });
 
-            await builder.Build().RunAsync();
+            var host = builder.Build();
+
+            // TODO
+            var cmsOptions = host.Services.GetService<ICms>();
+            cmsOptions.IsDevelopment = true;
+            
+            await host.RunAsync();
         }
     }
 }

@@ -19,6 +19,7 @@ namespace RapidCMS.Example.Shared.Data
             return new TagGroup()
             {
                 Id = Id,
+                DefaultTagId = DefaultTagId,
                 Name = Name,
                 Tags = Tags.Select(x => (Tag)x.Clone()).ToList()
             };

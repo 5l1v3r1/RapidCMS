@@ -1,5 +1,6 @@
 ﻿using RapidCMS.Core.Abstractions.Config;
 using RapidCMS.Core.Enums;
+using RapidCMS.Core.Repositories;
 using RapidCMS.Example.Shared.Components;
 using RapidCMS.Example.Shared.Data;
 using RapidCMS.Repositories;
@@ -12,7 +13,7 @@ namespace RapidCMS.Example.Shared.Collections
         public static void AddPersonCollection(this ICmsConfig config)
         {
             // TODO: switch repository
-            config.AddCollection<Person, InMemoryRepository<Person>>("person", "People", collection =>
+            config.AddCollection<Person, BaseRepository<Person>>("person", "People", collection =>
             {
                 collection
                     .SetTreeView(x => x.Name)

@@ -1,5 +1,6 @@
 ﻿using RapidCMS.Core.Abstractions.Config;
 using RapidCMS.Core.Enums;
+using RapidCMS.Core.Repositories;
 using RapidCMS.Example.Shared.Components;
 using RapidCMS.Example.Shared.Data;
 using RapidCMS.Example.Shared.Handlers;
@@ -15,7 +16,7 @@ namespace RapidCMS.Example.Shared.Collections
         public static void AddUserCollection(this ICmsConfig config)
         {
             // the CMS users https://ionicons.com/, so use the name of any Ion Icon as icon for a collection
-            config.AddCollection<User, InMemoryRepository<User>>("user", icon: "contacts", "Users", collection =>
+            config.AddCollection<User, BaseRepository<User>>("user", icon: "contacts", "Users", collection =>
             {
                 collection
                     .SetTreeView(EntityVisibilty.Hidden, x => x.Name)

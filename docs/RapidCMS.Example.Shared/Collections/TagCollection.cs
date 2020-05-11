@@ -1,5 +1,6 @@
 ﻿using RapidCMS.Core.Abstractions.Config;
 using RapidCMS.Core.Enums;
+using RapidCMS.Core.Repositories;
 using RapidCMS.Example.Shared.Components;
 using RapidCMS.Example.Shared.Data;
 using RapidCMS.Example.Shared.Handlers;
@@ -11,7 +12,7 @@ namespace RapidCMS.Example.Shared.Collections
     {
         public static void AddTagCollection(this ICmsConfig config)
         {
-            config.AddCollection<TagGroup, JsonRepository<TagGroup>>("taggroup", "Tag groups", collection =>
+            config.AddCollection<TagGroup, BaseRepository<TagGroup>>("taggroup", "Tag groups", collection =>
             {
                 collection
                     .SetTreeView(EntityVisibilty.Hidden, x => x.Name)
@@ -34,7 +35,7 @@ namespace RapidCMS.Example.Shared.Collections
 
                                 section.AddField(x => x.DefaultTagId).SetName("Default tag")
                                     .SetType(EditorType.Dropdown)
-                                    .SetCollectionRelation<Tag, JsonRepository<Tag>>(config =>
+                                    .SetCollectionRelation<Tag, BaseRepository<Tag>>(config =>
                                     {
                                         // this allows for configuring which property of the entity will make up the id for the element, and that value
                                         // is set to FavouriteChildId when the user selects an element
@@ -56,7 +57,7 @@ namespace RapidCMS.Example.Shared.Collections
 
                                 // the entity of this editor will be passed in as IParent in the repository of the 
                                 // sub collection, making it possible to access the parents properties in the childrens repository
-                                section.AddSubCollectionList<Tag, JsonRepository<Tag>>(config =>
+                                section.AddSubCollectionList<Tag, BaseRepository<Tag>>(config =>
                                 {
                                     config.SetListEditor(editor =>
                                     {
@@ -89,7 +90,7 @@ namespace RapidCMS.Example.Shared.Collections
                 // any collection can be added as subcollection, even collections based upon totally difference repositories
                 // this lets you mix repositories which are based upon totally different databases easily
                 collection
-                    .AddSubCollection<Tag, JsonRepository<Tag>>("tag", "Tags", subCollection =>
+                    .AddSubCollection<Tag, BaseRepository<Tag>>("tag", "Tags", subCollection =>
                     {
                         subCollection
                             .SetListEditor(editor =>

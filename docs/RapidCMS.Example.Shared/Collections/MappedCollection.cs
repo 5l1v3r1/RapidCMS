@@ -1,8 +1,8 @@
 ﻿using RapidCMS.Core.Abstractions.Config;
 using RapidCMS.Core.Enums;
+using RapidCMS.Core.Repositories;
 using RapidCMS.Example.Shared.Data;
 using RapidCMS.Example.Shared.DataViews;
-using RapidCMS.Repositories;
 
 namespace RapidCMS.Example.Shared.Collections
 {
@@ -11,7 +11,7 @@ namespace RapidCMS.Example.Shared.Collections
         // CRUD editor using a mapped repository
         public static void AddMappedCollection(this ICmsConfig config)
         {
-            config.AddCollection<MappedEntity, MappedInMemoryRepository<MappedEntity, DatabaseEntity>>("mapped", icon: "git-compare", "Mapped entities", collection =>
+            config.AddCollection<MappedEntity, MappedBaseRepository<MappedEntity, DatabaseEntity>>("mapped", icon: "git-compare", "Mapped entities", collection =>
             {
                 collection
                     .SetTreeView(EntityVisibilty.Hidden, x => x.Name)

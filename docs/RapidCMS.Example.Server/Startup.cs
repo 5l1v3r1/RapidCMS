@@ -9,6 +9,7 @@ using RapidCMS.Example.Shared.Data;
 using RapidCMS.Example.Shared.DataViews;
 using RapidCMS.Example.Shared.Handlers;
 using RapidCMS.Repositories;
+using RapidCMS.Core.Repositories;
 
 namespace RapidCMS.Example.Server
 {
@@ -28,15 +29,17 @@ namespace RapidCMS.Example.Server
             services.AddRazorPages();
             services.AddServerSideBlazor();
 
-            services.AddSingleton<InMemoryRepository<Person>>();
-            services.AddSingleton<JsonRepository<ConventionalPerson>>();
-            services.AddSingleton<JsonRepository<Country>>();
-            services.AddSingleton<InMemoryRepository<User>>();
-            services.AddSingleton<JsonRepository<TagGroup>>();
-            services.AddSingleton<JsonRepository<Tag>>();
+            // it's not required to add your repositories under the base repository
+            // but this allows the Server and the WebAssembly examples to share the collection configuration
+            services.AddSingleton<BaseRepository<Person>, JsonRepository<Person>>();
+            services.AddSingleton<BaseRepository<ConventionalPerson>, JsonRepository<ConventionalPerson>>();
+            services.AddSingleton<BaseRepository<Country>, JsonRepository<Country>>();
+            services.AddSingleton<BaseRepository<User>, JsonRepository<User>>();
+            services.AddSingleton<BaseRepository<TagGroup>, JsonRepository<TagGroup>>();
+            services.AddSingleton<BaseRepository<Tag>, JsonRepository<Tag>>();
 
-            services.AddSingleton<MappedInMemoryRepository<MappedEntity, DatabaseEntity>>();
-            services.AddSingleton<IConverter<MappedEntity, DatabaseEntity>>(new Mapper());
+            services.AddSingleton<MappedBaseRepository<MappedEntity, DatabaseEntity>, MappedInMemoryRepository<MappedEntity, DatabaseEntity>>();
+            services.AddSingleton<IConverter<MappedEntity, DatabaseEntity>, Mapper>();
             services.AddSingleton<DatabaseEntityDataViewBuilder>();
 
             services.AddSingleton<RandomNameActionHandler>();
@@ -110,29 +113,6 @@ namespace RapidCMS.Example.Server
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
-        }
-    }
-
-    public class Mapper : IConverter<MappedEntity, DatabaseEntity>
-    {
-        public MappedEntity Convert(DatabaseEntity obj)
-        {
-            return new MappedEntity
-            {
-                Description = obj.Description,
-                Id = obj.Id,
-                Name = obj.Name
-            };
-        }
-
-        public DatabaseEntity Convert(MappedEntity obj)
-        {
-            return new DatabaseEntity
-            {
-                Description = obj.Description,
-                Id = obj.Id,
-                Name = obj.Name
-            };
         }
     }
 }

@@ -121,8 +121,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddHttpContextAccessor();
             services.AddScoped<HttpContextAccessor>();
 
-            services.AddHttpClient();
-            services.AddScoped<HttpClient>();
+            // TODO: fix
+            //services.AddHttpClient();
+            //services.AddScoped<HttpClient>();
 
             // Semaphore for repositories
             services.AddSingleton(serviceProvider => new SemaphoreSlim(rootConfig.Advanced.SemaphoreCount, rootConfig.Advanced.SemaphoreCount));

@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{A1ABBF0C-8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RapidCMS.Example.Shared", "..\docs\RapidCMS.Example.Shared\RapidCMS.Example.Shared.csproj", "{F8FDC033-2DE9-4336-8320-3DABD9FDA154}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RapidCMS.Example.WebAssembly", "..\docs\RapidCMS.Example.WebAssembly\RapidCMS.Example.WebAssembly.csproj", "{9217968B-A732-4C71-A9B6-B3B2759F0829}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RapidCMS.Example.WebAssembly", "..\docs\RapidCMS.Example.WebAssembly\RapidCMS.Example.WebAssembly.csproj", "{9217968B-A732-4C71-A9B6-B3B2759F0829}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{89191FB4-6106-4A7E-82B2-7A2577F67D07}"
 	ProjectSection(SolutionItems) = preProject
@@ -33,6 +33,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{89191FB4-6
 		..\README.md = ..\README.md
 		..\SCREENSHOTS.md = ..\SCREENSHOTS.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RapidCMS.Example.WebAssembly.API", "..\docs\RapidCMS.Example.WebAssembly.API\RapidCMS.Example.WebAssembly.API.csproj", "{55D3BA00-92BE-4E5A-92DC-232959C7B8D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,6 +70,10 @@ Global
 		{9217968B-A732-4C71-A9B6-B3B2759F0829}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9217968B-A732-4C71-A9B6-B3B2759F0829}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9217968B-A732-4C71-A9B6-B3B2759F0829}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55D3BA00-92BE-4E5A-92DC-232959C7B8D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55D3BA00-92BE-4E5A-92DC-232959C7B8D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55D3BA00-92BE-4E5A-92DC-232959C7B8D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55D3BA00-92BE-4E5A-92DC-232959C7B8D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +86,7 @@ Global
 		{C208D591-422D-4F78-953B-B10D4D8E6AB6} = {D5C8E316-AA29-4FB7-A99D-F1047DCC10BE}
 		{F8FDC033-2DE9-4336-8320-3DABD9FDA154} = {D5C8E316-AA29-4FB7-A99D-F1047DCC10BE}
 		{9217968B-A732-4C71-A9B6-B3B2759F0829} = {D5C8E316-AA29-4FB7-A99D-F1047DCC10BE}
+		{55D3BA00-92BE-4E5A-92DC-232959C7B8D7} = {D5C8E316-AA29-4FB7-A99D-F1047DCC10BE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A24D735F-6ECC-4089-B6BF-DB09B1FCB7D8}

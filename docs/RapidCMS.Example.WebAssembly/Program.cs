@@ -16,6 +16,7 @@ using RapidCMS.Example.Shared.DataViews;
 using RapidCMS.Example.Shared.Handlers;
 using RapidCMS.Core.Abstractions.Setup;
 using Blazored.LocalStorage;
+using RapidCMS.Repositories.ApiBridge;
 
 namespace RapidCMS.Example.WebAssembly
 {
@@ -26,13 +27,14 @@ namespace RapidCMS.Example.WebAssembly
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
 
-            // builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddScoped(sp => 
+                new HttpClient { BaseAddress = new Uri("https://localhost:44396/api/person/") });
 
             builder.Services.AddAuthorizationCore();
 
             builder.Services.AddBlazoredLocalStorage();
 
-            builder.Services.AddScoped<BaseRepository<Person>, LocalStorageRepository<Person>>();
+            builder.Services.AddScoped<BaseRepository<Person>, ApiRepository<Person>>();
             builder.Services.AddSingleton<BaseRepository<ConventionalPerson>, InMemoryRepository<ConventionalPerson>>();
             builder.Services.AddSingleton<BaseRepository<Country>, InMemoryRepository<Country>>();
             builder.Services.AddSingleton<BaseRepository<User>, InMemoryRepository<User>>();
@@ -80,7 +82,7 @@ namespace RapidCMS.Example.WebAssembly
             // TODO
             var cmsOptions = host.Services.GetService<ICms>();
             cmsOptions.IsDevelopment = true;
-            
+
             await host.RunAsync();
         }
     }

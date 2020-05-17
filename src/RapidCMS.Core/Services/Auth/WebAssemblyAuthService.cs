@@ -8,7 +8,7 @@ using RapidCMS.Core.Forms;
 
 namespace RapidCMS.Core.Services.Auth
 {
-    internal class ClientSideAuthService : IAuthService
+    internal class WebAssemblyAuthService : IAuthService
     {
         public Task EnsureAuthorizedUserAsync(UsageType usageType, IEntity entity)
         {

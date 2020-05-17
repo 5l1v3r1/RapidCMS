@@ -18,7 +18,6 @@ namespace RapidCMS.Core.Forms
         private readonly FormState _formState = new FormState();
         private readonly List<PropertyState> _fieldStates = new List<PropertyState>();
 
-
         internal EditContext(string collectionAlias, IEntity entity, IParent? parent, UsageType usageType, IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));

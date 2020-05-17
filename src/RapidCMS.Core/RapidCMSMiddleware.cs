@@ -43,13 +43,10 @@ using RapidCMS.Core.Services.Tree;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class RapidCMSMiddleware
+    public static partial class RapidCMSMiddleware
     {
-        public static IServiceCollection AddRapidCMS(this IServiceCollection services, Action<ICmsConfig>? config = null)
+        private static IServiceCollection AddRapidCMSCore(this IServiceCollection services, CmsConfig rootConfig)
         {
-            var rootConfig = new CmsConfig();
-            config?.Invoke(rootConfig);
-
             services.AddSingleton(rootConfig);
             services.AddSingleton<ICmsConfig>(rootConfig);
 
@@ -101,8 +98,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IDragInteraction, DragInteraction>();
             services.AddTransient<IInteractionService, InteractionService>();
 
-            // TODO: switch services.AddTransient<IAuthService, ServerSideAuthService>();
-            services.AddTransient<IAuthService, ClientSideAuthService>();
             services.AddTransient<IConcurrencyService, ConcurrencyService>();
             services.AddSingleton<IExceptionService, ExceptionService>();
             services.AddScoped<IMessageService, MessageService>();
@@ -119,14 +114,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // UI requirements
             services.AddHttpContextAccessor();
-            services.AddScoped<HttpContextAccessor>();
+            services.AddScoped<HttpContextAccessor>(); // <-- why?
 
             // TODO: fix
             //services.AddHttpClient();
-            //services.AddScoped<HttpClient>();
-
-            // Semaphore for repositories
-            services.AddSingleton(serviceProvider => new SemaphoreSlim(rootConfig.Advanced.SemaphoreCount, rootConfig.Advanced.SemaphoreCount));
+            //services.AddScoped<HttpClient>(); // <-- why?
 
             services.AddFileReaderService();
 
@@ -140,6 +132,17 @@ namespace Microsoft.Extensions.DependencyInjection
             app.ApplicationServices.GetService<ICms>().IsDevelopment = isDevelopment;
 
             return app;
+        }
+
+        [Obsolete("Use AddRapidCMSServer or AddRapidCMSWebAssembly to indicate which deployment strategy you use. This method defaults to the serverside variant and will be removed in the future.")]
+        public static IServiceCollection AddRapidCMS(this IServiceCollection services, Action<ICmsConfig>? config = null)
+            => services.AddRapidCMSServer(config);
+
+        private static CmsConfig GetRootConfig(Action<ICmsConfig>? config = null)
+        {
+            var rootConfig = new CmsConfig();
+            config?.Invoke(rootConfig);
+            return rootConfig;
         }
     }
 }

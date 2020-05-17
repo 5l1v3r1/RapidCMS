@@ -45,20 +45,12 @@ namespace RapidCMS.Core.Services.Auth
 
         public async Task<bool> IsUserAuthorizedAsync(OperationAuthorizationRequirement operation, IEntity entity)
         {
-            Console.WriteLine(_serviceProvider);
-
             var authorizationService = _serviceProvider.GetService<IAuthorizationService>();
-
-            Console.WriteLine(authorizationService);
-            Console.WriteLine(_httpContextAccessor.HttpContext);
-
 
             var authorizationChallenge = await authorizationService.AuthorizeAsync(
                 _httpContextAccessor.HttpContext.User,
                 entity,
                 operation);
-
-            Console.WriteLine(authorizationChallenge);
 
             return authorizationChallenge.Succeeded;
         }

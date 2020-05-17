@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using RapidCMS.Example.Shared.Data;
+using RapidCMS.Repositories;
 
 namespace RapidCMS.Example.WebAssembly.API
 {
@@ -26,6 +28,13 @@ namespace RapidCMS.Example.WebAssembly.API
         {
             services.AddCors();
             services.AddControllers();
+
+            services.AddScoped<JsonRepository<Person>>();
+
+            services.AddRapidCMSApi(config =>
+            {
+                config.AllowAnonymousUser();
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -37,7 +46,7 @@ namespace RapidCMS.Example.WebAssembly.API
 
             app.UseHttpsRedirection();
             app.UseCors(builder => builder
-                .WithOrigins("https://localhost:44350")
+                .WithOrigins("https://localhost:5001")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials());

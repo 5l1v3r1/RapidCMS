@@ -46,7 +46,7 @@ namespace RapidCMS.Example.Server
             services.AddSingleton<Base64TextFileUploadHandler>();
             services.AddSingleton<Base64ImageUploadHandler>();
 
-            services.AddRapidCMS(config =>
+            services.AddRapidCMSServer(config =>
             {
                 config.AllowAnonymousUser();
 

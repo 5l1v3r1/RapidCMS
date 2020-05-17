@@ -28,7 +28,7 @@ namespace RapidCMS.Example.WebAssembly
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddScoped(sp => 
-                new HttpClient { BaseAddress = new Uri("https://localhost:44396/api/person/") });
+                new HttpClient { BaseAddress = new Uri("https://localhost:5003/api/person/") });
 
             builder.Services.AddAuthorizationCore();
 
@@ -49,10 +49,10 @@ namespace RapidCMS.Example.WebAssembly
             builder.Services.AddSingleton<Base64TextFileUploadHandler>();
             builder.Services.AddSingleton<Base64ImageUploadHandler>();
 
-            builder.Services.AddRapidCMS(config =>
+            builder.Services.AddRapidCMSWebAssembly(config =>
             {
                 config.AllowAnonymousUser();
-
+                
                 config.SetCustomLoginStatus(typeof(LoginStatus));
 
                 config.AddPersonCollection();

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using RapidCMS.Core.Abstractions.Data;
 using RapidCMS.Core.Abstractions.Dispatchers;
+using RapidCMS.Core.Abstractions.Factories;
 using RapidCMS.Core.Abstractions.Interactions;
 using RapidCMS.Core.Abstractions.Resolvers;
 using RapidCMS.Core.Abstractions.Services;
@@ -11,6 +12,7 @@ using RapidCMS.Core.Abstractions.Setup;
 using RapidCMS.Core.Abstractions.State;
 using RapidCMS.Core.Enums;
 using RapidCMS.Core.Extensions;
+using RapidCMS.Core.Forms;
 using RapidCMS.Core.Models.Data;
 using RapidCMS.Core.Models.Request;
 using RapidCMS.Core.Models.Response;
@@ -26,17 +28,20 @@ namespace RapidCMS.Core.Dispatchers
         private readonly IRepositoryResolver _repositoryResolver;
         private readonly IConcurrencyService _concurrencyService;
         private readonly IButtonInteraction _buttonInteraction;
+        private readonly IEditContextFactory _editContextFactory;
 
         public EntitiesInteractionDispatcher(
             ISetupResolver<ICollectionSetup> collectionResolver,
             IRepositoryResolver repositoryResolver,
             IConcurrencyService concurrencyService,
-            IButtonInteraction buttonInteraction)
+            IButtonInteraction buttonInteraction,
+            IEditContextFactory editContextFactory)
         {
             _collectionResolver = collectionResolver;
             _repositoryResolver = repositoryResolver;
             _concurrencyService = concurrencyService;
             _buttonInteraction = buttonInteraction;
+            _editContextFactory = editContextFactory;
         }
 
         Task<ListViewCommandResponseModel> IInteractionDispatcher<PersistEntitiesRequestModel, ListViewCommandResponseModel>.InvokeAsync(PersistEntitiesRequestModel request, IPageState pageState)
@@ -115,7 +120,8 @@ namespace RapidCMS.Core.Dispatchers
 
                         if (editContext.IsModified())
                         {
-                            await _concurrencyService.EnsureCorrectConcurrencyAsync(() => repository.UpdateAsync(editContext));
+                            var wrapper = _editContextFactory.GetEditContextWrapper(editContext);
+                            await _concurrencyService.EnsureCorrectConcurrencyAsync(() => repository.UpdateAsync(wrapper));
                         }
                         if (editContext.IsReordered())
                         {

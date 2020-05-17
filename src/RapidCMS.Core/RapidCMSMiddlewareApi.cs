@@ -3,9 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using RapidCMS.Core.Abstractions.Config;
 using RapidCMS.Core.Abstractions.Dispatchers;
+using RapidCMS.Core.Abstractions.Resolvers;
 using RapidCMS.Core.Abstractions.Services;
 using RapidCMS.Core.Authorization;
 using RapidCMS.Core.Dispatchers;
+using RapidCMS.Core.Models.Config;
+using RapidCMS.Core.Resolvers.Repositories;
+using RapidCMS.Core.Services.Parent;
 using RapidCMS.Core.Services.Persistence;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -18,10 +22,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="config"></param>
         /// <returns></returns>
-        public static IServiceCollection AddRapidCMSApi(this IServiceCollection services, Action<ICmsConfig>? config = null)
+        public static IServiceCollection AddRapidCMSApi(this IServiceCollection services, Action<IApiConfig>? config = null)
         {
-            // TODO: perhaps use a separete ICmsConfig interface
             var rootConfig = GetRootConfig(config);
+
+            services.AddSingleton(rootConfig);
 
             services.AddHttpContextAccessor();
 
@@ -31,7 +36,18 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.AddSingleton<AuthenticationStateProvider, AnonymousAuthenticationStateProvider>();
             }
 
+            services.AddTransient<IRepositoryResolver, ApiRepositoryResolver>();
+
+            services.AddTransient<IParentService, ParentService>();
+
             return services;
+        }
+
+        private static ApiConfig GetRootConfig(Action<IApiConfig>? config = null)
+        {
+            var rootConfig = new ApiConfig();
+            config?.Invoke(rootConfig);
+            return rootConfig;
         }
     }
 }

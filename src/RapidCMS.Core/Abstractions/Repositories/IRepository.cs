@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Primitives;
 using RapidCMS.Core.Abstractions.Data;
+using RapidCMS.Core.Abstractions.Forms;
 using RapidCMS.Core.Forms;
 
 namespace RapidCMS.Core.Abstractions.Repositories
@@ -22,8 +23,8 @@ namespace RapidCMS.Core.Abstractions.Repositories
         /// <param name="variantType"></param>
         /// <returns></returns>
         Task<IEntity> NewAsync(IParent? parent, Type? variantType);
-        Task<IEntity?> InsertAsync(EditContext editContext);
-        Task UpdateAsync(EditContext editContext);
+        Task<IEntity?> InsertAsync(IEditContext<IEntity> editContext);
+        Task UpdateAsync(IEditContext<IEntity> editContext);
         Task DeleteAsync(string id, IParent? parent);
 
         Task AddAsync(IRelated related, string id);

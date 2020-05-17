@@ -10,6 +10,12 @@ using RapidCMS.Core.Helpers;
 
 namespace RapidCMS.Core.Forms
 {
+    public class ApiEditContextWrapper<TEntity> : IEditContext<TEntity>
+        where TEntity : IEntity
+    {
+
+    }
+
     public class EditContextWrapper<TEntity> : IEditContext<TEntity>
         where TEntity : IEntity
     {

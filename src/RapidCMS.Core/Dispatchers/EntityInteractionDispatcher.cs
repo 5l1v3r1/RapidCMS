@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
+using RapidCMS.Core.Abstractions.Data;
 using RapidCMS.Core.Abstractions.Dispatchers;
+using RapidCMS.Core.Abstractions.Factories;
 using RapidCMS.Core.Abstractions.Interactions;
 using RapidCMS.Core.Abstractions.Resolvers;
 using RapidCMS.Core.Abstractions.Services;
 using RapidCMS.Core.Abstractions.Setup;
 using RapidCMS.Core.Abstractions.State;
 using RapidCMS.Core.Enums;
+using RapidCMS.Core.Forms;
 using RapidCMS.Core.Models.Request;
 using RapidCMS.Core.Models.Response;
 using RapidCMS.Core.Models.State;
@@ -22,17 +25,20 @@ namespace RapidCMS.Core.Dispatchers
         private readonly IRepositoryResolver _repositoryResolver;
         private readonly IConcurrencyService _concurrencyService;
         private readonly IButtonInteraction _buttonInteraction;
+        private readonly IEditContextFactory _editContextFactory;
 
         public EntityInteractionDispatcher(
             ISetupResolver<ICollectionSetup> collectionResolver,
             IRepositoryResolver repositoryResolver,
             IConcurrencyService concurrencyService,
-            IButtonInteraction buttonInteraction)
+            IButtonInteraction buttonInteraction,
+            IEditContextFactory editContextFactory)
         {
             _collectionResolver = collectionResolver;
             _repositoryResolver = repositoryResolver;
             _concurrencyService = concurrencyService;
             _buttonInteraction = buttonInteraction;
+            _editContextFactory = editContextFactory;
         }
 
         Task<NodeViewCommandResponseModel> IInteractionDispatcher<PersistEntityRequestModel, NodeViewCommandResponseModel>.InvokeAsync(PersistEntityRequestModel request, IPageState pageState)
@@ -89,7 +95,8 @@ namespace RapidCMS.Core.Dispatchers
                     break;
 
                 case CrudType.Update:
-                    await _concurrencyService.EnsureCorrectConcurrencyAsync(() => repository.UpdateAsync(request.EditContext));
+                    var updateWrapper = _editContextFactory.GetEditContextWrapper(request.EditContext);
+                    await _concurrencyService.EnsureCorrectConcurrencyAsync(() => repository.UpdateAsync(updateWrapper));
 
                     if (request.EditContext.IsReordered())
                     {
@@ -101,7 +108,8 @@ namespace RapidCMS.Core.Dispatchers
                     break;
 
                 case CrudType.Insert:
-                    var newEntity = await _concurrencyService.EnsureCorrectConcurrencyAsync(() => repository.InsertAsync(request.EditContext));
+                    var insertWrapper = _editContextFactory.GetEditContextWrapper(request.EditContext);
+                    var newEntity = await _concurrencyService.EnsureCorrectConcurrencyAsync(() => repository.InsertAsync(insertWrapper));
                     if (newEntity == null)
                     {
                         throw new Exception("Inserting the new entity failed.");

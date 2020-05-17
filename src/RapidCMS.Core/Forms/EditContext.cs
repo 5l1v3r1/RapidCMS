@@ -11,7 +11,7 @@ using RapidCMS.Core.Providers;
 
 namespace RapidCMS.Core.Forms
 {
-
+    // TODO: this class is a mess, it contains data, state, and lots of logic
     public sealed class EditContext
     {
         private readonly IServiceProvider _serviceProvider;

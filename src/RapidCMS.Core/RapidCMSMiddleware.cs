@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
 using Blazor.FileReader;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -30,7 +28,6 @@ using RapidCMS.Core.Resolvers.Convention;
 using RapidCMS.Core.Resolvers.Data;
 using RapidCMS.Core.Resolvers.Repositories;
 using RapidCMS.Core.Resolvers.Setup;
-using RapidCMS.Core.Services.Auth;
 using RapidCMS.Core.Services.Concurrency;
 using RapidCMS.Core.Services.Exceptions;
 using RapidCMS.Core.Services.Messages;
@@ -80,6 +77,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.AddSingleton<AuthenticationStateProvider, AnonymousAuthenticationStateProvider>();
             }
 
+            services.AddSingleton<IEditContextFactory, EditContextWrapperFactory>();
             services.AddTransient<IUIResolverFactory, UIResolverFactory>();
 
             services.AddTransient<IButtonActionHandlerResolver, ButtonActionHandlerResolver>();
@@ -117,7 +115,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<HttpContextAccessor>(); // <-- why?
 
             // TODO: fix
-            //services.AddHttpClient();
+            services.AddHttpClient();
             //services.AddScoped<HttpClient>(); // <-- why?
 
             services.AddFileReaderService();

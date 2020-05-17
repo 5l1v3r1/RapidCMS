@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using RapidCMS.Core.Abstractions.Data;
 using RapidCMS.Core.Models.Data;
 using static RapidCMS.Core.Models.Data.Query;
+using static RapidCMS.Core.Models.Data.ParentPath;
+using System.Reflection;
 
 namespace RapidCMS.Repositories.ApiBridge.Models
 {
@@ -27,8 +29,14 @@ namespace RapidCMS.Repositories.ApiBridge.Models
             SearchTerm = query.SearchTerm;
         }
 
+        public QueryModel(IParent? parent, Type? variantType) : this(parent)
+        {
+            VariantTypeName = variantType?.Name;
+        }
+
         public QueryModel(IParent? parent, Type? variantType, IQuery query) : this(parent, query)
         {
+            VariantTypeName = variantType?.Name;
         }
 
         public string? ParentPath { get; set; }
@@ -37,12 +45,14 @@ namespace RapidCMS.Repositories.ApiBridge.Models
         public int Take { get; set; }
         public string? SearchTerm { get; set; }
 
+        public string? VariantTypeName { get; set; }
+
         [JsonIgnore]
-        public IParent? Parent
+        public ParentPath? Parent
         {
             get
             {
-                return default;
+                return TryParse(ParentPath);
             }
         }
 
@@ -51,7 +61,7 @@ namespace RapidCMS.Repositories.ApiBridge.Models
         {
             get
             {
-                return default;
+                return VariantTypeName == null ? null : Assembly.GetExecutingAssembly().GetType(VariantTypeName);
             }
         }
 

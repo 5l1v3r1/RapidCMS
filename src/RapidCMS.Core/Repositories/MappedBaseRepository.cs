@@ -167,16 +167,16 @@ namespace RapidCMS.Core.Repositories
             return await NewAsync(parent, variantType) as IEntity;
         }
 
-        async Task<IEntity?> IRepository.InsertAsync(EditContext editContext)
+        async Task<IEntity?> IRepository.InsertAsync(IEditContext<IEntity> editContext)
         {
-            var data = await InsertAsync(new EditContextWrapper<TEntity>(editContext)) as IEntity;
+            var data = await InsertAsync((IEditContext<TEntity>)editContext) as IEntity;
             NotifyUpdate();
             return data;
         }
 
-        async Task IRepository.UpdateAsync(EditContext editContext)
+        async Task IRepository.UpdateAsync(IEditContext<IEntity> editContext)
         {
-            await UpdateAsync(new EditContextWrapper<TEntity>(editContext));
+            await UpdateAsync((IEditContext<TEntity>)editContext);
             NotifyUpdate();
         }
 

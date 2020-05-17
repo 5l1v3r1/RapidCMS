@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RapidCMS.Core.Abstractions.Repositories;
+using RapidCMS.Core.Abstractions.Services;
 using RapidCMS.Example.Shared.Data;
 using RapidCMS.Repositories;
 using RapidCMS.Repositories.ApiBridge;
@@ -18,8 +19,9 @@ namespace RapidCMS.Example.WebAssembly.API.Controllers
     {
         public PersonController(
             IAuthorizationService authorizationService, 
-            IHttpContextAccessor httpContextAccessor,
-            JsonRepository<Person> repository) : base(authorizationService, httpContextAccessor, repository)
+            IHttpContextAccessor httpContextAccessor, 
+            IParentService parentService, 
+            JsonRepository<Person> repository) : base(authorizationService, httpContextAccessor, parentService, repository)
         {
         }
     }

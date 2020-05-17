@@ -6,14 +6,11 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RapidCMS.Core.Abstractions.Data;
+using RapidCMS.Core.Abstractions.Forms;
 using RapidCMS.Core.Abstractions.Repositories;
 using RapidCMS.Core.Abstractions.Services;
 using RapidCMS.Core.Authorization;
-using RapidCMS.Core.Forms;
 using RapidCMS.Core.Models.Data;
-using RapidCMS.Core.Models.Request;
-using RapidCMS.Core.Models.Response;
-using RapidCMS.Core.Models.State;
 using RapidCMS.Repositories.ApiBridge.Models;
 
 namespace RapidCMS.Repositories.ApiBridge
@@ -24,15 +21,18 @@ namespace RapidCMS.Repositories.ApiBridge
     {
         private readonly IAuthorizationService _authorizationService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IParentService _parentService;
         private readonly IRepository _repository;
 
         protected RepositoryController(
             IAuthorizationService authorizationService,
             IHttpContextAccessor httpContextAccessor,
+            IParentService parentService,
             TRepository repository)
         {
             _authorizationService = authorizationService;
             _httpContextAccessor = httpContextAccessor;
+            _parentService = parentService;
             _repository = repository;
         }
 
@@ -46,13 +46,24 @@ namespace RapidCMS.Repositories.ApiBridge
             return authorizationChallenge.Succeeded;
         }
 
+        private Task<IParent?> GetParentAsync(ParentPath? parentPath)
+        {
+            return _parentService.GetParentAsync(parentPath);
+        }
+
+        private async Task<IEditContext<IEntity>> GetEditContextAsync(EditContextModel<TEntity> editContextModel)
+        {
+
+        }
+
         // TODO: validation?
         // TODO: parentId + IQuery + variant
 
         [HttpPost("entity/{id}")]
-        public async Task<ActionResult<TEntity>> HttpGetByIdAsync(string id, [FromBody]QueryModel query)
+        public async Task<ActionResult<TEntity>> HttpGetByIdAsync(string id, [FromBody] QueryModel query)
         {
-            var entity = await _repository.GetByIdAsync(id, query.Parent);
+            var parent = await GetParentAsync(query.Parent);
+            var entity = await _repository.GetByIdAsync(id, parent);
             if (!(entity is TEntity typedEntity))
             {
                 return NotFound();
@@ -67,15 +78,16 @@ namespace RapidCMS.Repositories.ApiBridge
         }
 
         [HttpPost("all")]
-        public async Task<ActionResult<IEnumerable<TEntity>>> HttpGetAllAsync([FromBody]QueryModel query)
+        public async Task<ActionResult<IEnumerable<TEntity>>> HttpGetAllAsync([FromBody] QueryModel query)
         {
-            var protoEntity = await _repository.NewAsync(query.Parent, query.VariantType);
+            var parent = await GetParentAsync(query.Parent);
+            var protoEntity = await _repository.NewAsync(parent, query.VariantType);
             if (!await IsAuthenticatedAsync(Operations.Read, protoEntity))
             {
                 return Forbid();
             }
 
-            var entities = await _repository.GetAllAsync(query.Parent, query.Query);
+            var entities = await _repository.GetAllAsync(parent, query.Query);
             return Ok(entities);
         }
 
@@ -83,10 +95,11 @@ namespace RapidCMS.Repositories.ApiBridge
 
         // get all non related 
 
-        [HttpGet("new")]
-        public async Task<ActionResult<TEntity>> HttpNewAsync()
+        [HttpPost("new")]
+        public async Task<ActionResult<TEntity>> HttpNewAsync([FromBody] QueryModel query)
         {
-            var entity = await _repository.NewAsync(default, default);
+            var parent = await GetParentAsync(query.Parent);
+            var entity = await _repository.NewAsync(parent, query.VariantType);
             if (!await IsAuthenticatedAsync(Operations.Create, entity))
             {
                 return Forbid();
@@ -95,31 +108,34 @@ namespace RapidCMS.Repositories.ApiBridge
         }
 
         [HttpPost("entity")]
-        public async Task<ActionResult<TEntity>> HttpInsertAsync([FromBody]TEntity entity)
+        public async Task<ActionResult<TEntity>> HttpInsertAsync([FromBody] EditContextModel<TEntity> editContextModel)
         {
-            if (!await IsAuthenticatedAsync(Operations.Create, entity))
+            if (!await IsAuthenticatedAsync(Operations.Create, editContextModel.Entity))
             {
                 return Forbid();
             }
-            var newEntity = await _repository.InsertAsync(default);
+            var editContext = await GetEditContextAsync(editContextModel);
+            var newEntity = await _repository.InsertAsync(editContext);
             return (TEntity)newEntity;
         }
 
-        [HttpPost("entity/{id}")]
-        public async Task<ActionResult> HttpUpdateAsync(string id, [FromBody]TEntity entity)
+        [HttpPut("entity/{id}")]
+        public async Task<ActionResult> HttpUpdateAsync(string id, [FromBody] EditContextModel<TEntity> editContextModel)
         {
-            if (!await IsAuthenticatedAsync(Operations.Update, entity))
+            if (!await IsAuthenticatedAsync(Operations.Update, editContextModel.Entity))
             {
                 return Forbid();
             }
-            await _repository.UpdateAsync(default);
+            var editContext = await GetEditContextAsync(editContextModel);
+            await _repository.UpdateAsync(editContext);
             return Ok();
         }
 
         [HttpDelete("entity/{id}")]
-        public async Task<ActionResult> HttpDeleteAsync(string id)
+        public async Task<ActionResult> HttpDeleteAsync(string id, [FromBody] QueryModel query)
         {
-            var entity = await _repository.GetByIdAsync(id, default);
+            var parent = await GetParentAsync(query.Parent);
+            var entity = await _repository.GetByIdAsync(id, parent);
             if (entity == null)
             {
                 return NotFound();

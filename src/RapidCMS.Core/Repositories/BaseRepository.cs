@@ -137,7 +137,7 @@ namespace RapidCMS.Core.Repositories
 
         async Task<IEntity?> IRepository.GetByIdAsync(string id, IParent? parent)
         {
-            return await GetByIdAsync(id, parent) as IEntity;
+            return await GetByIdAsync(id, parent);
         }
 
         async Task<IEnumerable<IEntity>> IRepository.GetAllAsync(IParent? parent, IQuery query)
@@ -157,19 +157,19 @@ namespace RapidCMS.Core.Repositories
 
         async Task<IEntity> IRepository.NewAsync(IParent? parent, Type? variantType)
         {
-            return await NewAsync(parent, variantType) as IEntity;
+            return await NewAsync(parent, variantType);
         }
 
-        async Task<IEntity?> IRepository.InsertAsync(EditContext editContext)
+        async Task<IEntity?> IRepository.InsertAsync(IEditContext<IEntity> editContext)
         {
-            var data = await InsertAsync(new EditContextWrapper<TEntity>(editContext)) as IEntity;
+            var data = await InsertAsync((IEditContext<TEntity>)editContext) as IEntity;
             NotifyUpdate();
             return data;
         }
 
-        async Task IRepository.UpdateAsync(EditContext editContext)
+        async Task IRepository.UpdateAsync(IEditContext<IEntity> editContext)
         {
-            await UpdateAsync(new EditContextWrapper<TEntity>(editContext));
+            await UpdateAsync((IEditContext<TEntity>)editContext);
             NotifyUpdate();
         }
 

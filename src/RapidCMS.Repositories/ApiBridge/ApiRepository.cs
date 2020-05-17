@@ -45,7 +45,7 @@ namespace RapidCMS.Repositories.ApiBridge
 
         public override async Task DeleteAsync(string id, IParent? parent)
         {
-            var request = new HttpRequestMessage(HttpMethod.Delete, $"entity/{id}");
+            var request = CreateRequest(HttpMethod.Post, $"entity/{id}", new QueryModel(parent));
             var response = await _httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
         }
@@ -70,10 +70,7 @@ namespace RapidCMS.Repositories.ApiBridge
 
         public override async Task<TEntity?> InsertAsync(IEditContext<TEntity> editContext)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "entity")
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(editContext.Entity), Encoding.UTF8, "application/json")
-            };
+            var request = CreateRequest(HttpMethod.Post, "entity", new EditContextModel<TEntity>(editContext));
             var response = await _httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
@@ -82,7 +79,7 @@ namespace RapidCMS.Repositories.ApiBridge
 
         public override async Task<TEntity> NewAsync(IParent? parent, Type? variantType = null)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"new");
+            var request = CreateRequest(HttpMethod.Post, "new", new QueryModel(parent, variantType));
             var response = await _httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
@@ -91,10 +88,7 @@ namespace RapidCMS.Repositories.ApiBridge
 
         public override async Task UpdateAsync(IEditContext<TEntity> editContext)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, $"entity/{editContext.Entity.Id}")
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(editContext.Entity), Encoding.UTF8, "application/json")
-            };
+            var request = CreateRequest(HttpMethod.Put, $"entity/{editContext.Entity.Id}", new EditContextModel<TEntity>(editContext));
             var response = await _httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
         }

@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
 using Newtonsoft.Json;
 using RapidCMS.Core.Abstractions.Data;
 using RapidCMS.Core.Models.Data;
-using static RapidCMS.Core.Models.Data.Query;
 using static RapidCMS.Core.Models.Data.ParentPath;
-using System.Reflection;
+using static RapidCMS.Core.Models.Data.Query;
 
 namespace RapidCMS.Repositories.ApiBridge.Models
 {
     public class QueryModel
     {
-        public QueryModel()
-        {
-
-        }
+        public QueryModel() { }
 
         public QueryModel(IParent? parent)
         {

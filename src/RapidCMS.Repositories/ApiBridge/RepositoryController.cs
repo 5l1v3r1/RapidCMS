@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
@@ -10,30 +11,35 @@ using RapidCMS.Core.Abstractions.Forms;
 using RapidCMS.Core.Abstractions.Repositories;
 using RapidCMS.Core.Abstractions.Services;
 using RapidCMS.Core.Authorization;
+using RapidCMS.Core.Enums;
+using RapidCMS.Core.Forms;
 using RapidCMS.Core.Models.Data;
 using RapidCMS.Repositories.ApiBridge.Models;
 
 namespace RapidCMS.Repositories.ApiBridge
 {
     public abstract class RepositoryController<TEntity, TRepository> : ControllerBase
-        where TEntity : IEntity
+        where TEntity : class, IEntity
         where TRepository : IRepository
     {
         private readonly IAuthorizationService _authorizationService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IParentService _parentService;
         private readonly IRepository _repository;
+        private readonly IServiceProvider _serviceProvider;
 
         protected RepositoryController(
             IAuthorizationService authorizationService,
             IHttpContextAccessor httpContextAccessor,
             IParentService parentService,
-            TRepository repository)
+            TRepository repository,
+            IServiceProvider serviceProvider)
         {
             _authorizationService = authorizationService;
             _httpContextAccessor = httpContextAccessor;
             _parentService = parentService;
             _repository = repository;
+            _serviceProvider = serviceProvider;
         }
 
         private async Task<bool> IsAuthenticatedAsync(OperationAuthorizationRequirement operation, IEntity entity)
@@ -51,9 +57,20 @@ namespace RapidCMS.Repositories.ApiBridge
             return _parentService.GetParentAsync(parentPath);
         }
 
-        private async Task<IEditContext<IEntity>> GetEditContextAsync(EditContextModel<TEntity> editContextModel)
+        private async Task<IEditContext<IEntity>> GetEditContextAsync(
+            UsageType usageType,
+            EntityState entityState,
+            EditContextModel<TEntity> editContextModel)
         {
+            var parent = await GetParentAsync(editContextModel.Parent);
 
+            return (IEditContext<IEntity>)new ApiEditContextWrapper<TEntity>(
+                usageType,
+                entityState,
+                editContextModel.Entity,
+                default,
+                parent,
+                _serviceProvider);
         }
 
         // TODO: validation?
